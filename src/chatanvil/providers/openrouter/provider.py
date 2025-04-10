@@ -20,10 +20,10 @@ class OpenRouterChat(ChatProvider):
         reasoning: bool = True,
         **kwargs: Any
     ):
-        
         self.base_url = base_url
         self.referer = referer
         self.title = title
+        self.reasoning = reasoning
         super().__init__(api_key, model)
         self.logger = ChatLogger("openrouter")
         # self._initialize()
@@ -48,7 +48,7 @@ class OpenRouterChat(ChatProvider):
         model: Optional[str] = None,
         system_prompt: Optional[str] = None,
         temperature: float = 0.5,
-        reasoning: bool = False,
+        reasoning: Optional[bool] = None,
         max_tokens: Optional[int] = None,
         **kwargs: Any,
     ) -> Union[str, Tuple[str, str]]:
@@ -67,6 +67,10 @@ class OpenRouterChat(ChatProvider):
                 )
 
             messages.append({"role": "user", "content": message})
+
+            # Use instance reasoning if not overridden
+            if reasoning is None:
+                reasoning = self.reasoning
 
             response = self.get_chat_completion(
                 messages=messages,
@@ -90,7 +94,7 @@ class OpenRouterChat(ChatProvider):
         messages: List[Dict[str, str]],
         model: Optional[str] = None,
         temperature: float = 0.5,
-        reasoning: bool = False,
+        reasoning: Optional[bool] = None,
         max_tokens: Optional[int] = None,
         **kwargs: Any,
     ) -> Union[str, Tuple[str, str]]:
@@ -102,8 +106,14 @@ class OpenRouterChat(ChatProvider):
             if self.title:
                 extra_headers["X-Title"] = self.title
 
+            # Use instance reasoning if not overridden
+            if reasoning is None:
+                reasoning = self.reasoning
+
+            # Create extra_body for include_reasoning
+            extra_body = {}
             if reasoning:
-                kwargs["include_reasoning"] = True
+                extra_body["include_reasoning"] = True
 
             response = self.client.chat.completions.create(
                 model=model or self.model or "microsoft/phi-3-medium-128k-instruct:free",
@@ -111,6 +121,7 @@ class OpenRouterChat(ChatProvider):
                 temperature=temperature,
                 max_tokens=max_tokens,
                 extra_headers=extra_headers,
+                extra_body=extra_body,
                 **kwargs,
             )
             if reasoning:

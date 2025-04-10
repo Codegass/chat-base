@@ -59,7 +59,7 @@ class OpenAIChat(ChatProvider):
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                **kwargs,
+                **{k: v for k, v in kwargs.items() if k != 'reasoning'},
             )
 
             result = response.choices[0].message.content
@@ -90,7 +90,7 @@ class OpenAIChat(ChatProvider):
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                **kwargs,
+                **{k: v for k, v in kwargs.items() if k != 'reasoning'},
             )
 
             return response.choices[0].message.content

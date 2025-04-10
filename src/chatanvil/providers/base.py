@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 
 
 class ChatProvider(ABC):
@@ -25,7 +25,7 @@ class ChatProvider(ABC):
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
         **kwargs: Any,
-    ) -> str:
+    ) -> Union[str, Tuple[str, str]]:
         """Get a response from the chat provider.
 
         Args:
@@ -37,7 +37,7 @@ class ChatProvider(ABC):
             **kwargs: Provider-specific parameters
 
         Returns:
-            The model's response as a string
+            The model's response as a string or tuple of (response, reasoning)
         """
         pass
 
@@ -49,7 +49,7 @@ class ChatProvider(ABC):
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
         **kwargs: Any,
-    ) -> Union[str, Dict[str, Any]]:
+    ) -> Union[str, Dict[str, Any], Tuple[str, str]]:
         """Get a chat completion from the provider.
 
         Args:
@@ -60,7 +60,7 @@ class ChatProvider(ABC):
             **kwargs: Provider-specific parameters
 
         Returns:
-            The model's response, either as a string or structured data
+            The model's response, either as a string, structured data, or tuple of (response, reasoning)
         """
         pass
 

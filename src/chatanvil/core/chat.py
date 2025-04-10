@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Type, Union, Tuple
 from ..providers.base import ChatProvider
 from .config import Config
 from ..parsers.factory import ParserFactory
@@ -13,10 +13,12 @@ class Chat:
         api_key: Optional[str] = None,
         model: Optional[str] = None,
         parser_type: str = "default",
+        reasoning: bool = False,
         **kwargs: Any,
     ):
         self.config = Config(service_provider=service_provider)
         self.provider_name = service_provider.lower()
+        self.reasoning = reasoning
 
         # Initialize the parser
         self.parser = ParserFactory.get_parser(parser_type)
@@ -63,11 +65,13 @@ class Chat:
         system_prompt: Optional[str] = None,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
+        reasoning: Optional[bool] = None,
         **kwargs: Any,
-    ) -> str:
+    ) -> Union[str, Tuple[str, str]]:
         """Get a response from the chat provider with parser."""
-        # Format the message
-        # formatted_message = self.parser.format_message(message)
+        # Use instance reasoning setting if not overridden in method call
+        if reasoning is None:
+            reasoning = self.reasoning
 
         # Get the raw response
         raw_response = self.provider.get_response(
@@ -76,6 +80,7 @@ class Chat:
             system_prompt=system_prompt,
             temperature=temperature,
             max_tokens=max_tokens,
+            reasoning=reasoning,
             **kwargs,
         )
 

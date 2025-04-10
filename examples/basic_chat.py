@@ -14,7 +14,6 @@ except ImportError:
     sys.path.append(str(Path(__file__).parent.parent / "src"))
     from chatanvil import Chat
 
-
 def main():
     # Initialize with OpenAI
     openai_chat = Chat(service_provider="openai")
